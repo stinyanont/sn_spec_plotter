@@ -13,13 +13,13 @@ import astropy.io.ascii as asci
 import astropy.constants as const
 import astropy.units as u
 import copy, os, sys
-
+# print(sys.argv)
 #some default parameters
 if len(sys.argv) == 2: #Can take filename as an argument from command line
     filename = sys.argv[1]
 else:
     filename = None #Start with this before browsed
-
+print(filename)
 z = 0 #redshift
 v = 0 #line velocity
 c = const.c.to(u.km/u.s).value #speed of light from astropy constants
@@ -143,6 +143,10 @@ def browseFiles():
     # Change label contents to display the file name.
     # We define this label later in the code
     # label_file_explorer.configure(text="File Opened: "+filename)
+
+############If filename is given from the command line
+if filename is not None:
+    plot_spec(filename, z)
 
 
 #Add a button to bring up file dialog
