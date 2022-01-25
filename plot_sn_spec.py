@@ -1,7 +1,7 @@
 # import all classes/methods
 # from the tkinter module
 import tkinter as tk
-from turtle import window_width
+# from turtle import window_width
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
@@ -12,22 +12,27 @@ import astropy.io.ascii as asci
 
 import astropy.constants as const
 import astropy.units as u
-import copy
-  
+import copy, os, sys
+
 #some default parameters
-filename = None #Start with this before browsed
+if len(sys.argv) == 2: #Can take filename as an argument from command line
+    filename = sys.argv[1]
+else:
+    filename = None #Start with this before browsed
+
 z = 0 #redshift
 v = 0 #line velocity
-c = const.c.to(u.km/u.s).value
+c = const.c.to(u.km/u.s).value #speed of light from astropy constants
 
-default_path = "/Users/kaew/work/optical_spectra/20210611_Kast" #########For testing
+# default_path = "/Users/kaew/work/optical_spectra/20210611_Kast" #########For testing
 # default_path = '.'
+default_path = os.getcwd() #current path where the code is called. 
 
 # Set up the main tkinter window
 window = tk.Tk()
   
 # setting the title and 
-window.title('SN Spectrum Plotter')
+window.title('Supernova Spectrum Plotter')
 
 # setting the dimensions of 
 # the main window
@@ -104,7 +109,10 @@ def plot_spec(filename, z):
     # plot1.clear()
 
 def update_plot(z, old_z):
-    # print(filename.strip('/'))
+    """
+    This function updates the plot by resetting data in the Line2D object.
+    Doing it this way rather than redrawing the line preserves zoom/pan settings. 
+    """
     x, y = spectrum_plot[0].get_data()
     spectrum_plot[0].set_data(x*(1+old_z)/(1+z),y)
     # spectrum_plot[0].set_visible(True)
@@ -137,15 +145,18 @@ def browseFiles():
     # label_file_explorer.configure(text="File Opened: "+filename)
 
 
-
+#Add a button to bring up file dialog
 button_explore = tk.Button(button_frame,
                         text = "Browse Files",
                         command = browseFiles)
 button_explore.grid(row = 1, column = 2)
 
 
-############Set redshift and velocity
+############Set redshift 
 def callback_z(sv):
+    """
+    callback function to set z when a new number is entered
+    """
     global z
     old_z = copy.deepcopy(z)
     # print(sv.get())
@@ -157,6 +168,7 @@ def callback_z(sv):
     # print(z, old_z)
     update_plot(z, old_z)
 
+#Set up a text box to get redshift
 sv_z = tk.StringVar()
 sv_z.trace("w", lambda name, index, mode, sv=sv_z: callback_z(sv_z))
 
@@ -189,6 +201,9 @@ wl_plot = [ [4341,4861,6563],
 [ 5890,5896]]
 
 def updateLines():
+    """
+    a function to update line plotting
+    """
     #clear all lines
     spec_lines.cla()
     # print('v=',v)
@@ -211,7 +226,7 @@ def callback_v(sv):
     updateLines()
 
 
-
+#Input text box to take velocity
 sv_v = tk.StringVar()
 sv_v.trace("w", lambda name, index, mode, sv=sv_v: callback_v(sv_v))
 
@@ -231,7 +246,7 @@ vbox.grid(row = 3, column = 2)
 # plot_button.grid(column = 2, row = 2)
 # plot_button.grid(row = 4, column = 2)
 
-#add the boxes
+#add the check boxes to plot lines from different species
 for i, specie in enumerate(all_elements):
     toPlots[i] = tk.BooleanVar(False)
     # check_box = tk.Checkbutton(button_frame, text=specie,variable=toPlot, onvalue=1, offvalue=0,
@@ -245,6 +260,8 @@ for i, specie in enumerate(all_elements):
 # print([x.get() for x in toPlots])
 # run the gui
 
+##################Final element: 
+# ################packing the plot and the matplotlib toolbar into the Tk canvas
 # # creating the Matplotlib toolbar
 toolbar = NavigationToolbar2Tk(canvas,
                                 plotting_frame, pack_toolbar=False)
@@ -257,4 +274,5 @@ toolbar.pack(side=tk.BOTTOM, fill=tk.X)
 
 canvas._tkcanvas.pack()
 
+#Run the Tk mainloop
 window.mainloop()
