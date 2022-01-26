@@ -268,7 +268,8 @@ for i, specie in enumerate(all_elements):
 # ################packing the plot and the matplotlib toolbar into the Tk canvas
 # # creating the Matplotlib toolbar
 toolbar = NavigationToolbar2Tk(canvas,
-                                plotting_frame, pack_toolbar=False)
+                                plotting_frame)
+#, pack_toolbar=False)
 toolbar.update()
 # # placing the toolbar on the Tkinter window
 # canvas._tkcanvas.pack()
