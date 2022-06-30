@@ -195,8 +195,8 @@ ls_dict = {'p':'-', 'f':'--', 's':':'}
 all_elements = ['H', 'He', 'Si', 'O', 'C', '[CaII]', 'Mg', 'Na']
 toPlots = [tk.BooleanVar(False)]*len(all_elements) #whether or not to plot this element
 element_box = [0]*len(all_elements)
-wl_plot = [ [4341,4861,6563], 
-[7065,6678,5876,4472,3886], 
+wl_plot = [ [4102, 4341,4861,6563, 10940, 12820, 18750, 21660], 
+[20581,10830,7065,6678,5876,4472,3886], 
 [4128,4131,5958,5979,6347,6371], 
 [6158,7772,7774,7775,8446,9263], 
 [], 
