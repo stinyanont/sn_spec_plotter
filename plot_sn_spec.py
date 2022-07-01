@@ -36,30 +36,30 @@ window.title('Supernova Spectrum Plotter')
 
 # setting the dimensions of 
 # the main window
-window.geometry("1000x600")
+window.geometry("1300x1000")
 
 #####This window is divided into two frames
 #Left frame for plotting
-plotting_frame = tk.Frame(window, width=800, height = 600)
+plotting_frame = tk.Frame(window, width=1300, height = 1000)
 plotting_frame.pack(side = tk.LEFT)
 #Right frame for plot controls (redshift, line velocity, etc)
-button_frame = tk.Frame(window, width=200, height = 600)
+button_frame = tk.Frame(window, width=50, height = 1000)
 button_frame.pack(side = tk.RIGHT)
 
 ########Set up the matplotlib fig and axis for the plot
 # the figure that will contain the plot
-fig = Figure(figsize = (8, 5),
+fig = Figure(figsize = (13, 10),
                 dpi = 100)
 # adding the subplot
 plot1 = fig.add_subplot(111)
-plot1.set_ylabel("Flux", fontsize = 12)
-plot1.tick_params(labelsize = 12)
+plot1.set_ylabel("Flux", fontsize = 18)
+plot1.tick_params(labelsize = 18)
 spectrum_plot = plot1.step([],[])
 spectrum_plot[0].set_visible(False)
 
 #This axis is for plotting the line markers
 spec_lines = plot1.twinx()
-
+spec_lines.set_yticks([])
 # creating the Tkinter canvas
 # containing the Matplotlib figure
 canvas = FigureCanvasTkAgg(fig,
@@ -98,12 +98,13 @@ def plot_spec(filename, z):
     # plot1.set_xlim([np.min(x/(1+z)), np.max(x/(1+z))]) #Set x,y lims
     # plot1.set_ylim([np.min(y), np.max(y)])
     # recompute the ax.dataLim
-    plot1.relim()
+    plot1.set_xlim([np.min(x/(1+z)), np.max(x/(1+z)) ])
+
     # update ax.viewLim using the new dataLim
     plot1.autoscale_view()
 
-    plot1.set_xlabel(r"Wavelength $\rm \AA$ (z = %.4f)"%z, fontsize = 12)
-    plot1.set_title(title, fontsize = 12)
+    plot1.set_xlabel(r"Wavelength $\rm \AA$ (z = %.4f)"%z, fontsize = 18)
+    plot1.set_title(title, fontsize = 18)
     fig.tight_layout()
     canvas.draw()
     # plot1.clear()
@@ -117,13 +118,13 @@ def update_plot(z, old_z):
     spectrum_plot[0].set_data(x*(1+old_z)/(1+z),y)
     # spectrum_plot[0].set_visible(True)
     # # recompute the ax.dataLim
-    # plot1.relim()
+    plot1.relim()
     # # update ax.viewLim using the new dataLim
-    # plot1.autoscale_view()
-
-    plot1.set_xlabel(r"Wavelength $\rm \AA$ (z = %.4f)"%z, fontsize = 12)
+    plot1.autoscale_view()
+    # plot1.set_xlim([np.min(x*(1+old_z)/(1+z)), np.max(x*(1+old_z)/(1+z)) ])
+    plot1.set_xlabel(r"Wavelength $\rm \AA$ (z = %.4f)"%z, fontsize = 18)
     # plot1.set_title(title, fontsize = 12)
-    # fig.tight_layout()
+    fig.tight_layout()
     canvas.draw()
     # plot1.clear()
   
@@ -188,21 +189,28 @@ zbox.grid(row = 2, column = 2)
 ###############PLOTTING LINES
 lines_to_plot = []
 #dictionary for the color of the line for each element
-element_color_dict = {'H':'r', 'He':'y', 'Si':'c', 'O':'b', 'C':'m', 'Mg':'C0', '[CaII]':'C1', 'Na':'C2'} #TO DO add more
+element_color_dict = {'H':'r', 'He':'y', 'Si II':'c', 
+                'O I':'b', '[O I]':'b', 'O II':'b', 'O II SLSN':'b', 
+                'C II':'m', 'Ca II':'C1', '[Ca II]':'C1', 'Mg II':'C0', 'Na I':'C2'} #TO DO add more
 #dictionary for line style: solid for permitted, dashed for forbidden, and dotted for semi-forbidden
 ls_dict = {'p':'-', 'f':'--', 's':':'} 
 
-all_elements = ['H', 'He', 'Si', 'O', 'C', '[CaII]', 'Mg', 'Na']
+all_elements = ['H', 'He', 'Si II', 'O I', '[O I]', 'O II', 'O II SLSN', 'C II',  'Ca II', '[Ca II]', 'Mg II', 'Na I']
+type_transition = ['p', 'p', 'p', 'p', 'f', 'p', 'p', 'p', 'p', 'f', 'p', 'p']
 toPlots = [tk.BooleanVar(False)]*len(all_elements) #whether or not to plot this element
 element_box = [0]*len(all_elements)
 wl_plot = [ [4102, 4341,4861,6563, 10940, 12820, 18750, 21660], 
 [20581,10830,7065,6678,5876,4472,3886], 
 [4128,4131,5958,5979,6347,6371], 
 [6158,7772,7774,7775,8446,9263], 
-[], 
+[5577,6300,6363],
+[3390,3377,4416,6641,6721],
+[3960,4115,4358,4651],
+[3919,3921,4267,5145,5890,6578,7231,7236,9234,9891], 
+[3934,3969, 8498,8542,8662],
 [7292,7324],
-[],
-[ 5890,5896]]
+[4481,7877,7896,8214,8235,9218,9244,9632],
+[5890,5896]]
 
 def updateLines():
     """
@@ -216,7 +224,8 @@ def updateLines():
         if toPlots[ind].get() == True:
             for wl in wl_plot[ind]:
                 z_vel = np.sqrt((c+v)/(c-v)) - 1
-                spec_lines.axvline(wl*(1+z_vel), color = element_color_dict[element], lw = 1)
+                spec_lines.axvline(wl*(1+z_vel), color = element_color_dict[element], ls = ls_dict[type_transition[ind]] , lw = 1)
+    spec_lines.set_yticks([])
     canvas.draw()
 
 def callback_v(sv):
@@ -277,7 +286,8 @@ toolbar.update()
 toolbar.pack(side=tk.BOTTOM, fill=tk.X)
 # canvas.get_tk_widget().pack()
 
-canvas._tkcanvas.pack()
+# canvas._tkcanvas.pack(expand = True, fill = 'both')
+canvas._tkcanvas.pack(expand = True, fill = 'both')
 
 #Run the Tk mainloop
 window.mainloop()
