@@ -34,9 +34,22 @@ window = tk.Tk()
 # setting the title and 
 window.title('Supernova Spectrum Plotter')
 
+
+
+# #Create an instance of tkinter frame
+# win= Tk()
+
+# #Set the geometry of frame
+# win.geometry("650x250")
+
+#Get the current screen width and height
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+
 # setting the dimensions of 
 # the main window
-window.geometry("1300x1000")
+window.geometry("%dx%d"%(0.8*screen_width, 0.8*screen_height))
+
 
 #####This window is divided into two frames
 #Left frame for plotting
@@ -48,8 +61,9 @@ button_frame.pack(side = tk.RIGHT)
 
 ########Set up the matplotlib fig and axis for the plot
 # the figure that will contain the plot
-fig = Figure(figsize = (13, 10),
-                dpi = 100)
+dpi = 100
+fig = Figure(figsize = (0.6*screen_width/dpi, 0.8*screen_height/dpi),
+                dpi = dpi)
 # adding the subplot
 plot1 = fig.add_subplot(111)
 plot1.set_ylabel("Flux", fontsize = 18)
@@ -197,7 +211,8 @@ ls_dict = {'p':'-', 'f':'--', 's':':'}
 
 all_elements = ['H', 'He', 'Si II', 'O I', '[O I]', 'O II', 'O II SLSN', 'C II',  'Ca II', '[Ca II]', 'Mg II', 'Na I']
 type_transition = ['p', 'p', 'p', 'p', 'f', 'p', 'p', 'p', 'p', 'f', 'p', 'p']
-toPlots = [tk.BooleanVar(False)]*len(all_elements) #whether or not to plot this element
+toPlots = [tk.BooleanVar()]*len(all_elements) #whether or not to plot this element
+# toPlots = [False]*len(all_elements)
 element_box = [0]*len(all_elements)
 wl_plot = [ [4102, 4341,4861,6563, 10940, 12820, 18750, 21660], 
 [20581,10830,7065,6678,5876,4472,3886], 
@@ -261,7 +276,8 @@ vbox.grid(row = 3, column = 2)
 
 #add the check boxes to plot lines from different species
 for i, specie in enumerate(all_elements):
-    toPlots[i] = tk.BooleanVar(False)
+    toPlots[i] = tk.BooleanVar()
+    # toPlots[i] = False
     # check_box = tk.Checkbutton(button_frame, text=specie,variable=toPlot, onvalue=1, offvalue=0,
     #             command = lambda: modify_line_to_plot(toPlot, specie))
     element_box[i] = tk.Checkbutton(button_frame, text=specie,variable=toPlots[i], onvalue=1, offvalue=0,
