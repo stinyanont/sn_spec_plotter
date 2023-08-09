@@ -110,7 +110,7 @@ def plot_spec(filename, z):
     spectrum_plot[0].set_data(x/(1+z),y) 
     spectrum_plot[0].set_visible(True) #make it visible
     # plot1.set_xlim([np.min(x/(1+z)), np.max(x/(1+z))]) #Set x,y lims
-    # plot1.set_ylim([np.min(y), np.max(y)])
+    plot1.set_ylim([np.min(y), np.max(y)])
     # recompute the ax.dataLim
     plot1.set_xlim([np.min(x/(1+z)), np.max(x/(1+z)) ])
 
